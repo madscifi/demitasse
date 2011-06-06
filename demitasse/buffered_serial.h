@@ -1,6 +1,10 @@
 #ifndef BUFFERED_SERIAL_H_
 #define BUFFERED_SERIAL_H_
 
+#include <stdarg.h>
+#include <stdio.h>
+
+
 #ifndef TESTBUILD
 #include <plib.h>
 #endif
@@ -162,6 +166,26 @@
 #endif
 
 extern BufferedSerial gSerial;
+
+extern "C"
+{
+
+#define PSTR(x) x
+#define serial_writestr_P(x) gSerial.WriteStringBlocking( x )
+#define serial_writechar(x) gSerial.WriteCharBlocking(x)
+
+inline void sersendf_P( const char *format, ... ) 
+{
+  va_list args;
+  va_start(args, format);
+  char buffer[100];
+  vsnprintf(buffer, sizeof(buffer), format, args);
+  gSerial.WriteStringBlocking( buffer );
+}
+
+
+
+} // extern "C"
 
 
 #endif

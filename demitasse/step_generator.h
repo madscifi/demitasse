@@ -5,8 +5,6 @@
 #include <plib.h>
 #endif
 
-#include <stdarg.h>
-#include <stdio.h>
 
 #include "port_pin.h"
 #include "buffered_serial.h"
@@ -474,22 +472,6 @@ struct StepGenerator
 
 
 
-extern "C"
-{
-
-#define PSTR(x) x
-#define serial_writestr_P(x) gSerial.WriteStringBlocking( x )
-#define serial_writechar(x) gSerial.WriteCharBlocking(x)
-
-inline void sersendf_P( const char *format, ... ) 
-{
-  va_list args;
-  va_start(args, format);
-  char buffer[100];
-  vsnprintf(buffer, sizeof(buffer), format, args);
-  gSerial.WriteStringBlocking( buffer );
-}
-
 inline void queue_wait() 
 {
   for (;StepGenerator::IsFull();) 
@@ -506,9 +488,6 @@ inline void home_z_negative() {}
 inline void home_x_positive() {}
 inline void home_y_positive() {}
 inline void home_z_positive() {}
-
-
-} // extern "C"
 
 extern PortPin debugPin;
 
