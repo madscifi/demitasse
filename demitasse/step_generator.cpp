@@ -5,6 +5,9 @@
 #include "gcode_parse.h"
 #endif
 
+
+uint32_t Stats::bmCount;
+
 PortPin debugPin = { PortPin::AIO0, 0 };
 
 unsigned int StepGenerator::live_axis_count = 0;

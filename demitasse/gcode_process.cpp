@@ -502,7 +502,13 @@ void process_gcode_command() {
 				// newline is sent from gcode_parse after we return
 				break;
 			#endif /* DEBUG */
-				// unknown mcode: spit an error
+
+                        case 300:
+                              Stats::Display( next_target.seen_S );
+			      // newline is sent from gcode_parse after we return
+                              break;
+                              
+			// unknown mcode: spit an error
 			default:
 				sersendf_P(PSTR("E: Bad M-code %d"), next_target.M);
 				// newline is sent from gcode_parse after we return

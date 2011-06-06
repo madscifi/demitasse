@@ -134,7 +134,7 @@ typedef struct {
 	};
 
 	uint8_t						G;				///< G command number
-	uint8_t						M;				///< M command number
+	uint16_t					M;				///< M command number
 	TARGET						target;		///< target position: X, Y, Z, E and F
 
 	int16_t						S;				///< S word (various uses)

@@ -5,13 +5,32 @@
 #include <plib.h>
 #endif
 
-
 #include "port_pin.h"
 #include "buffered_serial.h"
 
 #include "ring_buffer.h"
 
 enum { X_STEPPER_INDEX, Y_STEPPER_INDEX, Z_STEPPER_INDEX, E_STEPPER_INDEX, STEPPER_COUNT };
+
+struct Stats
+{
+  static uint32_t bmCount;
+  
+  static void Display( bool reset )
+  {
+    sersendf_P("bm:%x ", bmCount );
+    if( reset )
+    {
+      bmCount = 0;
+    }
+  }
+  
+  static void IncBM()
+  {
+    ++bmCount;
+  }
+
+};
 
 struct StepGenerator
 {
@@ -32,7 +51,7 @@ struct StepGenerator
     StepperMove moveCommands[ STEPPER_COUNT ];
   };
   
-  typedef RingBuffer<StepperMoves,16> RingBufferType;
+  typedef RingBuffer<StepperMoves,32> RingBufferType;
   static RingBufferType stepper_move_buffer;
 
 
@@ -150,7 +169,8 @@ struct StepGenerator
      
      if( wasEmpty )
      {
-       gSerial.WriteStringBlocking( "[bm]  " );
+       Stats::IncBM();
+       gSerial.WriteStringBlocking( "[bm] " );
      }
    }
    
