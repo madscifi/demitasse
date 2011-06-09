@@ -70,7 +70,7 @@ const int32_t STEPS_PER_M_E = (  38.500 * 1000 /*mm/m*/ * MICROSTEPPING_E);
 const int32_t MAXIMUM_FEEDRATE_X_MM_M = 2000;
 const int32_t MAXIMUM_FEEDRATE_Y_MM_M = 2000;
 const int32_t MAXIMUM_FEEDRATE_Z_MM_M = 30;
-const int32_t MAXIMUM_FEEDRATE_E_MM_M = 400;
+const int32_t MAXIMUM_FEEDRATE_E_MM_M = 800;
 
 // used when searching endstops and as default feedrate
 // In MM/M
