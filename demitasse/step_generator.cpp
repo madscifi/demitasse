@@ -6,6 +6,7 @@
 #endif
 
 
+
 uint32_t Stats::bmCount;
 
 PortPin debugPin = { PortPin::AIO0, 0 };
@@ -19,10 +20,10 @@ unsigned int StepGenerator::live_axis_count = 0;
 
 PortPin StepGenerator::dirPins[] = 
 { 
-  { PortPin::DIO2, X_INVERT_DIR }, // x dir pin
-  { PortPin::DIO4, Y_INVERT_DIR }, // y dir pin
-  { PortPin::DIO7, Z_INVERT_DIR }, // z dir pin
-  { PortPin::DIO8, E_INVERT_DIR }  // e dir pin
+  { PortPin::DIO2, 0 }, //X_INVERT_DIR }, // x dir pin
+  { PortPin::DIO4, 0 }, //Y_INVERT_DIR }, // y dir pin
+  { PortPin::DIO7, 0 }, //Z_INVERT_DIR }, // z dir pin
+  { PortPin::DIO8, 0 }, //E_INVERT_DIR }  // e dir pin
 };
 
 StepGenerator::RingBufferType StepGenerator::stepper_move_buffer;

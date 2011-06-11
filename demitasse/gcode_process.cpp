@@ -26,7 +26,7 @@ uint8_t next_tool;
 static void zero_x(void) {
 	TARGET t = MotionPlanner::startpoint;
 	t.X = 0;
-	t.F = SEARCH_FEEDRATE_X;
+	t.F = Option::x_search_feedrate_mm_m;
 	MotionPlanner::ScheduleMovement(&t);
 }
 
@@ -34,7 +34,7 @@ static void zero_x(void) {
 static void zero_y(void) {
 	TARGET t = MotionPlanner::startpoint;
 	t.Y = 0;
-	t.F = SEARCH_FEEDRATE_Y;
+	t.F = Option::y_search_feedrate_mm_m;
 	MotionPlanner::ScheduleMovement(&t);
 }
 
@@ -42,7 +42,7 @@ static void zero_y(void) {
 static void zero_z(void) {
 	TARGET t = MotionPlanner::startpoint;
 	t.Z = 0;
-	t.F = SEARCH_FEEDRATE_Z;
+	t.F = Option::z_search_feedrate_mm_m;
 	MotionPlanner::ScheduleMovement(&t);
 }
 
@@ -123,7 +123,7 @@ void process_gcode_command() {
 			// since it would be a major hassle to force the dda to not synchronise, just provide a fast feedrate and hope it's close enough to what host expects
 			case 0:
 				backup_f = next_target.target.F;
-				next_target.target.F = MAXIMUM_FEEDRATE_X_MM_M * 2L;
+				next_target.target.F = Option::x_max_feedrate_mm_m * 2L;
 				MotionPlanner::ScheduleMovement(&next_target.target);
 				next_target.target.F = backup_f;
 				break;
@@ -503,11 +503,40 @@ void process_gcode_command() {
 				break;
 			#endif /* DEBUG */
 
+                        // Display stats
                         case 300:
                               Stats::Display( next_target.seen_S );
 			      // newline is sent from gcode_parse after we return
                               break;
-                              
+                        
+                        // Set an option - P contains option index, S contains option value
+                        // If S is not present, simply echos the current value 
+                        case 310:
+                          if( next_target.seen_P )
+                          {
+                            if( next_target.seen_S )
+                            {
+                                SettableOption::SetOptionValue( next_target.P, next_target.S );
+                            }
+                            double v = SettableOption::GetOptionValue( next_target.P );
+			    sersendf_P("value: %f ", v );
+                          }                            
+                          break;
+                        
+                        // Reset the value of an option to the reboot default
+                        case 311:
+                          if( next_target.seen_P )
+                          {
+                            SettableOption::ResetOptionValue( next_target.P );
+                          }
+                          break;
+
+                        // Reset all option values to their reboot default values
+                        // Not certain if this command is a good idea or not.
+                        case 312:
+                          SettableOption::ResetAllValues();
+                          break;
+                          
 			// unknown mcode: spit an error
 			default:
 				sersendf_P(PSTR("E: Bad M-code %d"), next_target.M);

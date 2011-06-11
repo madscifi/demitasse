@@ -9,6 +9,7 @@
 #include "buffered_serial.h"
 
 #include "ring_buffer.h"
+#include "utils.h"
 
 enum { X_STEPPER_INDEX, Y_STEPPER_INDEX, Z_STEPPER_INDEX, E_STEPPER_INDEX, STEPPER_COUNT };
 
@@ -51,7 +52,7 @@ struct StepGenerator
     StepperMove moveCommands[ STEPPER_COUNT ];
   };
   
-  typedef RingBuffer<StepperMoves,32> RingBufferType;
+  typedef RingBuffer<StepperMoves,16> RingBufferType;
   static RingBufferType stepper_move_buffer;
 
 
@@ -182,7 +183,7 @@ struct StepGenerator
 
      if( moves->moveCommands[X_STEPPER_INDEX].initial_delay )
      {
-       dirPins[ X_STEPPER_INDEX ].SetTo( moves->moveCommands[X_STEPPER_INDEX].direction );
+       dirPins[ X_STEPPER_INDEX ].SetTo( moves->moveCommands[X_STEPPER_INDEX].direction ^ Option::x_invert_dir );
        OC1R = now + moves->moveCommands[X_STEPPER_INDEX].initial_delay;
        OC1CONSET = _OC1CON_OCM0_MASK;
        IEC0SET = _IEC0_OC1IE_MASK;
@@ -192,7 +193,7 @@ struct StepGenerator
      
      if( moves->moveCommands[Y_STEPPER_INDEX].initial_delay )
      {
-       dirPins[Y_STEPPER_INDEX].SetTo( moves->moveCommands[Y_STEPPER_INDEX].direction );
+       dirPins[Y_STEPPER_INDEX].SetTo( moves->moveCommands[Y_STEPPER_INDEX].direction ^ Option::y_invert_dir );
        OC2R = now + moves->moveCommands[Y_STEPPER_INDEX].initial_delay;
        OC2CONSET = _OC2CON_OCM0_MASK;
        IEC0SET = _IEC0_OC2IE_MASK;
@@ -201,7 +202,7 @@ struct StepGenerator
      }
      if( moves->moveCommands[Z_STEPPER_INDEX].initial_delay )
      {
-       dirPins[Z_STEPPER_INDEX].SetTo( moves->moveCommands[Z_STEPPER_INDEX].direction );
+       dirPins[Z_STEPPER_INDEX].SetTo( moves->moveCommands[Z_STEPPER_INDEX].direction ^ Option::z_invert_dir );
        OC3R = now + moves->moveCommands[Z_STEPPER_INDEX].initial_delay;
        OC3CONSET = _OC3CON_OCM0_MASK;
        IEC0SET = _IEC0_OC3IE_MASK;
@@ -210,7 +211,7 @@ struct StepGenerator
      }
      if( moves->moveCommands[E_STEPPER_INDEX].initial_delay )
      {
-       dirPins[E_STEPPER_INDEX].SetTo( moves->moveCommands[E_STEPPER_INDEX].direction );
+       dirPins[E_STEPPER_INDEX].SetTo( moves->moveCommands[E_STEPPER_INDEX].direction ^ Option::e_invert_dir );
        OC4R = now + moves->moveCommands[E_STEPPER_INDEX].initial_delay;
        OC4CONSET = _OC4CON_OCM0_MASK;
        IEC0SET = _IEC0_OC4IE_MASK;

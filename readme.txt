@@ -114,3 +114,45 @@ Digital Pins
 Analog Pins
 A0 - currently used as a digital output for debugging purposes
 
+Experimental Commands
+---------------------
+
+M300 [S0]
+Display stats infomation. Currently the only stats is the count of times
+that the begin move function is call from outside of the interrupt
+context. Including S0 resets all of the stats.
+
+M310 Pn [Sv]
+Set/display runtime configuration values. If S is not provided the
+current value is simply displayed. Note that these settings are always
+lost upon reset as there is presently no way to save them.
+
+  Pn values
+  1   x max feedrate (mm/min)
+  2   y max feedrate (mm/min)
+  3   z max feedrate (mm/min)
+  4   e max feedrate (mm/min)
+  
+  5   x search feedrate (mm/min)
+  6   y search feedrate (mm/min)
+  7   z search feedrate (mm/min)
+  8   e search feedrate (mm/min)
+
+  9   x steps per meter
+ 10   y steps per meter
+ 11   z steps per meter
+ 12   e steps per meter
+ 
+ // for the next 4, S0 is false,
+ // any other S value sets the option to true
+ 13   x invert direction output pin polarity
+ 14   y invert direction output pin polarity
+ 15   z invert direction output pin polarity
+ 16   e invert direction output pin polarity
+
+M311 Pn
+Reset runtime configuration value to its initial value (what it is after
+a hardware reset).
+
+M312 
+Reset all runtime configuration values to their initial values.

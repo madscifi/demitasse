@@ -5,6 +5,7 @@
 #include <math.h>
 #include "gcode_parse.h"
 #include "step_generator.h"
+#include "utils.h"
 
 
 #define	max(a,b)	(((a) > (b)) ? (a) : (b))
@@ -193,10 +194,10 @@ void MotionPlanner::ScheduleMovement( TARGET* target )
   
   int32_t pu_rounding = POSITION_UNITS_PARTS_PER_METER / 2;
 
-  int32_t target_x_steps = ((int64_t)target->X * (int64_t) STEPS_PER_M_X + ((target->X>=0)?pu_rounding:-pu_rounding)) / POSITION_UNITS_PARTS_PER_METER;
-  int32_t target_y_steps = ((int64_t)target->Y * (int64_t) STEPS_PER_M_Y + ((target->Y>=0)?pu_rounding:-pu_rounding)) / POSITION_UNITS_PARTS_PER_METER;
-  int32_t target_z_steps = ((int64_t)target->Z * (int64_t) STEPS_PER_M_Z + ((target->Z>=0)?pu_rounding:-pu_rounding)) / POSITION_UNITS_PARTS_PER_METER;
-  int32_t target_e_steps = (((int64_t)target->E+use_e_error) * (int64_t) STEPS_PER_M_E + ((target->E>=0)?pu_rounding:-pu_rounding)) / POSITION_UNITS_PARTS_PER_METER;
+  int32_t target_x_steps = ((int64_t)target->X * (int64_t) Option::x_steps_per_meter + ((target->X>=0)?pu_rounding:-pu_rounding)) / POSITION_UNITS_PARTS_PER_METER;
+  int32_t target_y_steps = ((int64_t)target->Y * (int64_t) Option::y_steps_per_meter + ((target->Y>=0)?pu_rounding:-pu_rounding)) / POSITION_UNITS_PARTS_PER_METER;
+  int32_t target_z_steps = ((int64_t)target->Z * (int64_t) Option::z_steps_per_meter + ((target->Z>=0)?pu_rounding:-pu_rounding)) / POSITION_UNITS_PARTS_PER_METER;
+  int32_t target_e_steps = (((int64_t)target->E+use_e_error) * (int64_t) Option::e_steps_per_meter + ((target->E>=0)?pu_rounding:-pu_rounding)) / POSITION_UNITS_PARTS_PER_METER;
   
   int32_t x_magnitude_steps = abs(target_x_steps - startpoint_steps.X);
   int32_t y_magnitude_steps = abs(target_y_steps - startpoint_steps.Y);
@@ -211,10 +212,10 @@ void MotionPlanner::ScheduleMovement( TARGET* target )
   #endif
   #endif
 
-  int x_magnitude_steps_pu = ((int64_t)x_magnitude_steps * POSITION_UNITS_PARTS_PER_METER + (STEPS_PER_M_X/2)) / (int64_t) STEPS_PER_M_X;
-  int y_magnitude_steps_pu = ((int64_t)y_magnitude_steps * POSITION_UNITS_PARTS_PER_METER + (STEPS_PER_M_Y/2)) / (int64_t) STEPS_PER_M_Y;
-  int z_magnitude_steps_pu = ((int64_t)z_magnitude_steps * POSITION_UNITS_PARTS_PER_METER + (STEPS_PER_M_Z/2)) / (int64_t) STEPS_PER_M_Z;
-  int e_magnitude_steps_pu = ((int64_t)e_magnitude_steps * POSITION_UNITS_PARTS_PER_METER + (STEPS_PER_M_E/2)) / (int64_t) STEPS_PER_M_E;
+  int x_magnitude_steps_pu = ((int64_t)x_magnitude_steps * POSITION_UNITS_PARTS_PER_METER + (Option::x_steps_per_meter/2)) / (int64_t) Option::x_steps_per_meter;
+  int y_magnitude_steps_pu = ((int64_t)y_magnitude_steps * POSITION_UNITS_PARTS_PER_METER + (Option::y_steps_per_meter/2)) / (int64_t) Option::y_steps_per_meter;
+  int z_magnitude_steps_pu = ((int64_t)z_magnitude_steps * POSITION_UNITS_PARTS_PER_METER + (Option::z_steps_per_meter/2)) / (int64_t) Option::z_steps_per_meter;
+  int e_magnitude_steps_pu = ((int64_t)e_magnitude_steps * POSITION_UNITS_PARTS_PER_METER + (Option::e_steps_per_meter/2)) / (int64_t) Option::e_steps_per_meter;
 
   #if DEBUG_STEP_GENERATION
   sersendf_P( "mxsu=%d mysu=%d mzsu=%d mesu=%d ", x_magnitude_steps_pu, y_magnitude_steps_pu, z_magnitude_steps_pu, e_magnitude_steps_pu );
@@ -285,10 +286,10 @@ void MotionPlanner::ScheduleMovement( TARGET* target )
   unsigned int move_duration_at_requested_rate_ticks = ((int64_t)traval_magnitude_steps_pu * 60 * 1000000 * 5) / ((int64_t)target->F * POSITION_UNITS_PARTS_PER_METER/1000);
 
   // compute durations assuming the max feedrate for each axis
-  unsigned int move_duration_at_max_x_rate_ticks = ((int64_t)x_magnitude_steps_pu * 60 * 1000000 * 5) / ((int64_t)MAXIMUM_FEEDRATE_X_MM_M * POSITION_UNITS_PARTS_PER_METER/1000);
-  unsigned int move_duration_at_max_y_rate_ticks = ((int64_t)y_magnitude_steps_pu * 60 * 1000000 * 5) / ((int64_t)MAXIMUM_FEEDRATE_Y_MM_M * POSITION_UNITS_PARTS_PER_METER/1000);
-  unsigned int move_duration_at_max_z_rate_ticks = ((int64_t)z_magnitude_steps_pu * 60 * 1000000 * 5) / ((int64_t)MAXIMUM_FEEDRATE_Z_MM_M * POSITION_UNITS_PARTS_PER_METER/1000);
-  unsigned int move_duration_at_max_e_rate_ticks = ((int64_t)e_magnitude_steps_pu * 60 * 1000000 * 5) / ((int64_t)MAXIMUM_FEEDRATE_E_MM_M * POSITION_UNITS_PARTS_PER_METER/1000);
+  unsigned int move_duration_at_max_x_rate_ticks = ((int64_t)x_magnitude_steps_pu * 60 * 1000000 * 5) / ((int64_t)Option::x_max_feedrate_mm_m * POSITION_UNITS_PARTS_PER_METER/1000);
+  unsigned int move_duration_at_max_y_rate_ticks = ((int64_t)y_magnitude_steps_pu * 60 * 1000000 * 5) / ((int64_t)Option::y_max_feedrate_mm_m * POSITION_UNITS_PARTS_PER_METER/1000);
+  unsigned int move_duration_at_max_z_rate_ticks = ((int64_t)z_magnitude_steps_pu * 60 * 1000000 * 5) / ((int64_t)Option::z_max_feedrate_mm_m * POSITION_UNITS_PARTS_PER_METER/1000);
+  unsigned int move_duration_at_max_e_rate_ticks = ((int64_t)e_magnitude_steps_pu * 60 * 1000000 * 5) / ((int64_t)Option::e_max_feedrate_mm_m * POSITION_UNITS_PARTS_PER_METER/1000);
 
   // the longest interval is the lower bound for what is an acceptable speed
   unsigned int move_duration_limit_ticks 
@@ -553,22 +554,22 @@ void MotionPlanner::ScheduleMovement( TARGET* target )
 void MotionPlanner::SetXPosition( int32_t pos )
 {
   startpoint.X = /*current_position.X =*/ pos;
-  startpoint_steps.X = ((int64_t)pos * (int64_t) STEPS_PER_M_X + ((pos>=0)?(POSITION_UNITS_PARTS_PER_METER/2):-(POSITION_UNITS_PARTS_PER_METER/2))) / POSITION_UNITS_PARTS_PER_METER;
+  startpoint_steps.X = ((int64_t)pos * (int64_t) Option::x_steps_per_meter + ((pos>=0)?(POSITION_UNITS_PARTS_PER_METER/2):-(POSITION_UNITS_PARTS_PER_METER/2))) / POSITION_UNITS_PARTS_PER_METER;
 }
 void MotionPlanner::SetYPosition( int32_t pos )
 {
   startpoint.Y = /*current_position.Y =*/ pos;
-  startpoint_steps.Y = ((int64_t)pos * (int64_t) STEPS_PER_M_Y + ((pos>=0)?(POSITION_UNITS_PARTS_PER_METER/2):-(POSITION_UNITS_PARTS_PER_METER/2))) / POSITION_UNITS_PARTS_PER_METER;
+  startpoint_steps.Y = ((int64_t)pos * (int64_t) Option::y_steps_per_meter + ((pos>=0)?(POSITION_UNITS_PARTS_PER_METER/2):-(POSITION_UNITS_PARTS_PER_METER/2))) / POSITION_UNITS_PARTS_PER_METER;
 }
 void MotionPlanner::SetZPosition( int32_t pos )
 {
   startpoint.Z = /*current_position.X =*/ pos;
-  startpoint_steps.Z = ((int64_t)pos * (int64_t) STEPS_PER_M_Z + ((pos>=0)?(POSITION_UNITS_PARTS_PER_METER/2):-(POSITION_UNITS_PARTS_PER_METER/2))) / POSITION_UNITS_PARTS_PER_METER;
+  startpoint_steps.Z = ((int64_t)pos * (int64_t) Option::z_steps_per_meter + ((pos>=0)?(POSITION_UNITS_PARTS_PER_METER/2):-(POSITION_UNITS_PARTS_PER_METER/2))) / POSITION_UNITS_PARTS_PER_METER;
 }
  void MotionPlanner::SetEPosition( int32_t pos )
 {
   startpoint.E = /*current_position.X =*/ pos;
-  startpoint_steps.E = ((int64_t)pos * (int64_t) STEPS_PER_M_E + ((pos>=0)?(POSITION_UNITS_PARTS_PER_METER/2):-(POSITION_UNITS_PARTS_PER_METER/2))) / POSITION_UNITS_PARTS_PER_METER;
+  startpoint_steps.E = ((int64_t)pos * (int64_t) Option::e_steps_per_meter + ((pos>=0)?(POSITION_UNITS_PARTS_PER_METER/2):-(POSITION_UNITS_PARTS_PER_METER/2))) / POSITION_UNITS_PARTS_PER_METER;
   if( E_AXIS_BEHAVIOR == E_AXIS_RELATIVE_ERROR_ACCUMULATE )
   {
     e_error = 0;

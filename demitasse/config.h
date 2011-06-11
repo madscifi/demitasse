@@ -2,6 +2,7 @@
 #define CONFIG_H_
 
 #include "processor.h"
+//#include "utils.h"
 
 // units expressed as parts per meter in which positions are
 // represented. At present only the value of 1000000 is supported,
@@ -36,6 +37,9 @@ const E_AXIS_BEHAVIOR_TYPE E_AXIS_BEHAVIOR = E_AXIS_RELATIVE_ERROR_ACCUMULATE;
 *                                                                           *
 \***************************************************************************/
 
+namespace Config
+{
+  
 // calculate these values appropriate for your machine
 // for threaded rods, this is (steps motor per turn) / (pitch of the thread)
 // for belts, this is (steps per motor turn) / (number of gear teeth) / (belt module)
@@ -83,5 +87,7 @@ const bool X_INVERT_DIR = true;
 const bool Y_INVERT_DIR = true;
 const bool Z_INVERT_DIR = true;
 const bool E_INVERT_DIR = true;
+
+} // namespace Config
 
 #endif // CONFIG_H_
